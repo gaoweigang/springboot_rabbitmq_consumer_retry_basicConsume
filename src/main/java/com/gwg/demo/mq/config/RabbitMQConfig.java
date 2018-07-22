@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.fastjson.JSON;
+import com.gwg.demo.mq.common.Action;
 import com.gwg.demo.mq.common.Constant;
 import com.gwg.demo.mq.common.DetailResult;
 import com.gwg.demo.mq.common.MessageConsumer;
@@ -95,6 +96,8 @@ public class RabbitMQConfig {
 			
 			@Override
 			public DetailResult consume() {
+				Action action = Action.RETRY; 
+				long deliveryTag = 0;
 				try {
 					GetResponse response = channel.basicGet(queue, false);	
 					while(response == null){
@@ -105,15 +108,18 @@ public class RabbitMQConfig {
 					Message message = new Message(response.getBody(), messagePropertiesConverter
 							.toMessageProperties(response.getProps(), response.getEnvelope(), "UTF-8"));
 					T messageBean = (T) messageConverter.fromMessage(message);
-					logger.info("consume 消息处理 start....，消息内容：", JSON.toJSON(messageBean));
+					logger.info("consume 消息处理 start....，消息内容：{}", JSON.toJSON(messageBean));
 					DetailResult result = userMessageProccess().process(messageBean);
 					//手动确认
+					deliveryTag = response.getEnvelope().getDeliveryTag();
 					if(result.isSuccess()){//
 						logger.info("消费成功 返回确认消息....");
-						channel.basicAck(response.getEnvelope().getDeliveryTag(), false);
+						action = Action.ACCEPT;
+						//channel.basicAck(response.getEnvelope().getDeliveryTag(), false);
 					}else{
 						logger.info("消费失败,消息重新入队....");
-						channel.basicNack(response.getEnvelope().getDeliveryTag(), false, true);//前提是需要设置消息确认模式为手动，否则无效
+						action = Action.RETRY;
+						//channel.basicNack(response.getEnvelope().getDeliveryTag(), false, true);//前提是需要设置消息确认模式为手动，否则无效
 					}
 					return result;
 				} catch (IOException e) {
@@ -124,6 +130,13 @@ public class RabbitMQConfig {
 					return new DetailResult(false, e.getMessage());
 				} finally{
 					try {
+						if(action == Action.ACCEPT){
+							channel.basicAck(deliveryTag, false);
+						}else if(action == Action.RETRY){
+							channel.basicNack(deliveryTag, false, true);//前提是需要设置消息确认模式为手动，否则无效
+						}else if(action == Action.REJECT){
+							channel.basicNack(deliveryTag, false, false);//前提是需要设置消息确认模式为手动，否则无效
+						}
 						channel.close();
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -181,7 +194,7 @@ public class RabbitMQConfig {
 	public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(){
 		SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory = new SimpleRabbitListenerContainerFactory();
 		rabbitListenerContainerFactory.setConnectionFactory(connectionFactory());
-		rabbitListenerContainerFactory.setConcurrentConsumers(1);
+		rabbitListenerContainerFactory.setConcurrentConsumers(2);
 		rabbitListenerContainerFactory.setMaxConcurrentConsumers(10);
 		rabbitListenerContainerFactory.setAcknowledgeMode(AcknowledgeMode.MANUAL);//设置消费者消息确认模式为手动
 		return rabbitListenerContainerFactory;

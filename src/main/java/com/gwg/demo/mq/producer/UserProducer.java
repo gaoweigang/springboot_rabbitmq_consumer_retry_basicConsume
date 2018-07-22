@@ -23,7 +23,7 @@ public class UserProducer {
 	
 	public void produce() {
 		logger.info("消息 生产 start .....");
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < 5; i++){
 			messageProducer.produce(new UserMessage(1000+i, "gaoweiang"+i, new Date()));		
 		}
 

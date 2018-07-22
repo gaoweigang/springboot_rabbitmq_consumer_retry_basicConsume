@@ -1,12 +1,5 @@
-1.exchange到queue成功,则不回调returnCallback
-2.exchange到queue失败,则回调returnCallback(需设置mandatory=true,否则不回回调,消息就丢了)
-
-模拟场景：让消息到达exchange,但是不让消息到达queue
-1.前提需要已经创建exchange,这样消息才会到exchange,创建exchange:EXCHANGE_TEST
-2.创建队列queue:QUEUE_TEST
-3.不要将EXCHANGE_TEST与QUEUE_TEST绑定
-
-参考：https://www.cnblogs.com/wangzhongqiu/p/7815529.html
+RabbitMQ的ack与nack:
+https://blog.csdn.net/kdc18333608478/article/details/77552546?foxhandler=RssReadRenderProcessHandler
 
 后续：
 队列里面有消息，但是为什么取不出来
