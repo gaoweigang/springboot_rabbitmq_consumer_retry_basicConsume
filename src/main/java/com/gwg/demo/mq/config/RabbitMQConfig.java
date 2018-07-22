@@ -113,7 +113,7 @@ public class RabbitMQConfig {
 						channel.basicAck(response.getEnvelope().getDeliveryTag(), false);
 					}else{
 						logger.info("消费失败,消息重新入队....");
-						channel.basicNack(response.getEnvelope().getDeliveryTag(), false, true);
+						channel.basicNack(response.getEnvelope().getDeliveryTag(), false, true);//前提是需要设置消息确认模式为手动，否则无效
 					}
 					return result;
 				} catch (IOException e) {
