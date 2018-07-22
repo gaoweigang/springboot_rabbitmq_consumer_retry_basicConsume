@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/src/main/main.iml" filepath="$PROJECT_DIR$/src/main/main.iml" />
       <module fileurl="file://$PROJECT_DIR$/springboot_helloworld.iml" filepath="$PROJECT_DIR$/springboot_helloworld.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot_rabbitmq_consumer_retry.iml" filepath="$PROJECT_DIR$/springboot_rabbitmq_consumer_retry.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/test/test.iml" filepath="$PROJECT_DIR$/src/test/test.iml" />
     </modules>
   </component>
 </project>

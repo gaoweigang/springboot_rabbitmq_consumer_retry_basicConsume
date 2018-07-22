@@ -7,3 +7,6 @@
 3.不要将EXCHANGE_TEST与QUEUE_TEST绑定
 
 参考：https://www.cnblogs.com/wangzhongqiu/p/7815529.html
+
+后续：
+队列里面有消息，但是为什么取不出来
