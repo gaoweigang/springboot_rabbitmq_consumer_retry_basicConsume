@@ -2,8 +2,17 @@
 1.使用basicGet(queue, autoAck)来从队列获取消息，并且设置该条消息需要手动确认
 2.如果消费失败，则要求队列重发
 channel.basicNack(deliveryTag, false, true);
-3.但是这样做有一个问题，始终消费的是失败的记录,进行死循环了
+3.但是这样做有一个问题，始终消费的是失败的记录,导致进行死循环了，
+原因是出异常后，把消息塞回队列头部，下一步又消费这条会出异常的消息，又出错，塞回队列……
+进入了死循环了，当然新的消息不会消费，导致堆积了……
 4.解决：
+方法一：即使消费失败了，任然返回消息已经被消费成功，但是重新发布消息到队尾，这样能够保证正常的消息能够继续消费
+channel.basicAck(deliveryTag, false, true);//发送消费成功
+channel.basicPublish();//重新将消息发送到队列尾部
+
+方法二：如果消费失败，将消息记录到日志表，采用Job跑批处理
+
+
 
 
 
@@ -12,3 +21,6 @@ channel.basicNack(deliveryTag, false, true);
 后续
 RabbitMQ的ack与nack:
 https://blog.csdn.net/kdc18333608478/article/details/77552546?foxhandler=RssReadRenderProcessHandler
+
+RabbitMQ的ack或nack机制使用不当导致的队列堵塞或死循环问题：
+https://blog.csdn.net/youbl/article/details/80425959

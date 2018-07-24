@@ -96,10 +96,10 @@ public class RabbitMQConfig {
 			
 			@Override
 			public DetailResult consume() {
-				Action action = Action.RETRY; 
-				long deliveryTag = 0;
+				Action action = Action.RETRY;
+				GetResponse response = null;
 				try {
-					GetResponse response = channel.basicGet(queue, false);	
+					response = channel.basicGet(queue, false);
 					while(response == null){
 						response = channel.basicGet(queue, false);
 					    Thread.sleep(Constant.ONE_SECOND);
@@ -109,8 +109,6 @@ public class RabbitMQConfig {
 					T messageBean = (T) messageConverter.fromMessage(message);
 					logger.info("consume 消息处理 start....，消息内容：{}", JSON.toJSON(messageBean));
 					DetailResult result = userMessageProccess().process(messageBean);
-					//手动确认
-					deliveryTag = response.getEnvelope().getDeliveryTag();
 					if(result.isSuccess()){//
 						logger.info("消费成功 返回确认消息....");
 						action = Action.ACCEPT;
@@ -131,13 +129,13 @@ public class RabbitMQConfig {
 					try {
 						if(action == Action.ACCEPT){
 							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
-							channel.basicAck(deliveryTag, false);
+							channel.basicAck(response.getEnvelope().getDeliveryTag(), false);
 						}else if(action == Action.RETRY){
 							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
-							channel.basicNack(deliveryTag, false, true);//消息重新入队
+							channel.basicNack(response.getEnvelope().getDeliveryTag(), false, true);//消息重新入队
 						}else if(action == Action.REJECT){
 							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
-							channel.basicNack(deliveryTag, false, false);//丢弃消息
+							channel.basicNack(response.getEnvelope().getDeliveryTag(), false, false);//丢弃消息
 						}
 						channel.close();
 					} catch (IOException e) {
