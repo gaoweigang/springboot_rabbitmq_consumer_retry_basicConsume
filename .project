@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>springboot_rabbitmq_consumer_retry</name>
+	<name>springboot_rabbitmq_consumer_retry_basicConsume</name>
 	<comment></comment>
 	<projects>
 	</projects>

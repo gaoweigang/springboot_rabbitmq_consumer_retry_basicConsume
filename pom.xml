@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.example</groupId>
-	<artifactId>springboot_rabbitmq_consumer_retry_basicGet</artifactId>
+	<artifactId>springboot_rabbitmq_consumer_retry_basicConsume</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<parent>
@@ -12,7 +12,6 @@
 	</parent>
 
 	<properties>
-		<spring.version>4.3.7.RELEASE</spring.version>
 		<rabbitmq.version>1.7.2.RELEASE</rabbitmq.version>
 		<lombok.version>1.16.4</lombok.version>
 	</properties>
