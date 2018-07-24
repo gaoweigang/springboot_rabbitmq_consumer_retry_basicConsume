@@ -1,5 +1,14 @@
+参考官方例子：https://www.rabbitmq.com/nack.html
+1.使用basicGet(queue, autoAck)来从队列获取消息，并且设置该条消息需要手动确认
+2.如果消费失败，则要求队列重发
+channel.basicNack(deliveryTag, false, true);
+3.但是这样做有一个问题，始终消费的是失败的记录,进行死循环了
+4.解决：
+
+
+
+
+
+后续
 RabbitMQ的ack与nack:
 https://blog.csdn.net/kdc18333608478/article/details/77552546?foxhandler=RssReadRenderProcessHandler
-
-后续：
-队列里面有消息，但是为什么取不出来

@@ -104,7 +104,6 @@ public class RabbitMQConfig {
 						response = channel.basicGet(queue, false);
 					    Thread.sleep(Constant.ONE_SECOND);
 					}
-					logger.info("从队列中获取的消息：{}",JSON.toJSON(response));
 					Message message = new Message(response.getBody(), messagePropertiesConverter
 							.toMessageProperties(response.getProps(), response.getEnvelope(), "UTF-8"));
 					T messageBean = (T) messageConverter.fromMessage(message);
@@ -131,11 +130,14 @@ public class RabbitMQConfig {
 				} finally{
 					try {
 						if(action == Action.ACCEPT){
+							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
 							channel.basicAck(deliveryTag, false);
 						}else if(action == Action.RETRY){
-							channel.basicNack(deliveryTag, false, true);//前提是需要设置消息确认模式为手动，否则无效
+							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
+							channel.basicNack(deliveryTag, false, true);//消息重新入队
 						}else if(action == Action.REJECT){
-							channel.basicNack(deliveryTag, false, false);//前提是需要设置消息确认模式为手动，否则无效
+							//前提是需要在basicGet()的时候设置消息确认模式为手动，否则无效
+							channel.basicNack(deliveryTag, false, false);//丢弃消息
 						}
 						channel.close();
 					} catch (IOException e) {
@@ -185,20 +187,5 @@ public class RabbitMQConfig {
 			}
 		};
 	}
-	
-	/******************message listener************************************************************/
-	/**
-	 * 监听器配置
-	 */
-	@Bean
-	public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(){
-		SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory = new SimpleRabbitListenerContainerFactory();
-		rabbitListenerContainerFactory.setConnectionFactory(connectionFactory());
-		rabbitListenerContainerFactory.setConcurrentConsumers(2);
-		rabbitListenerContainerFactory.setMaxConcurrentConsumers(10);
-		rabbitListenerContainerFactory.setAcknowledgeMode(AcknowledgeMode.MANUAL);//设置消费者消息确认模式为手动
-		return rabbitListenerContainerFactory;
-	}
-
 
 }
