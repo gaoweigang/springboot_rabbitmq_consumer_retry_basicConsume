@@ -1,7 +1,7 @@
 参考官方例子：https://www.rabbitmq.com/confirms.html
 
 基于basicConsume实现推消息和消息监听
-
+http://www.caosh.me/be-tech/rabbitmq-pull-multiple/
 
 
 
