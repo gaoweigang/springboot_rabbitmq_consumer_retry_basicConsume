@@ -62,6 +62,9 @@ public class RabbitMQConfig {
 		return connectionFactory;
 	}
 	
+	/**
+	 * 实现消息监听
+	 */
 	@Bean
 	public MessageConsumer messageConsumer() throws IOException{
 		logger.info("创建用户消费者");
