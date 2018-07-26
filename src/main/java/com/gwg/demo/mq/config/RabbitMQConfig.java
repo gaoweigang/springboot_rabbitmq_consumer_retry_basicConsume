@@ -15,9 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.gwg.demo.mq.common.DetailResult;
+import com.gwg.demo.mq.common.MessageConsumer;
 import com.gwg.demo.mq.common.MessageProducer;
-import com.gwg.demo.mq.consumer.message.process.MessageProcess;
-import com.gwg.demo.mq.consumer.message.process.impl.UserMessageProcess;
+import com.gwg.demo.mq.consumer.process.MessageProcess;
+import com.gwg.demo.mq.consumer.process.impl.UserMessageProcess;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -61,6 +62,13 @@ public class RabbitMQConfig {
 		return connectionFactory;
 	}
 	
+	@Bean
+	public MessageConsumer messageConsumer() throws IOException{
+		logger.info("创建用户消费者");
+		MessageConsumer messageConsumer = new MessageConsumer(connectionFactory(), userMessageProccess(), exchange, queue, routing);
+		messageConsumer.consume();//启动消费监听
+		return messageConsumer;
+	}
 	
 	//用户消息处理类
 	@Bean("userMessageProccess")

@@ -1,4 +1,4 @@
-package com.gwg.demo.mq.consumer.message.process;
+package com.gwg.demo.mq.consumer.process;
 
 import com.gwg.demo.mq.common.DetailResult;
 
